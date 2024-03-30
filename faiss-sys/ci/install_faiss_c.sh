@@ -3,6 +3,7 @@ set -eu
 
 repo_url=https://github.com/facebookresearch/faiss
 repo_rev=v1.8.0
+rev_hash=4e6b6f8
 
 git clone "$repo_url" faiss --branch "$repo_rev" --depth 1
 
@@ -10,7 +11,10 @@ mkdir -p "$HOME/.faiss_c"
 
 cd faiss
 
-git rev-parse HEAD > ../rev_hash
+git checkout "$rev_hash"
+
+echo "$rev_hash" > ../rev_hash
+# git rev-parse HEAD > ../rev_hash
 
 if [[ -s "$HOME/.faiss_c/rev_hash" && `diff -w -q ../rev_hash $HOME/.faiss_c/rev_hash` -eq "0" ]]; then
     echo "libfaiss_c.so is already built for revision" `cat ../rev_hash`
