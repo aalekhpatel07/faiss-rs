@@ -2,10 +2,10 @@
 set -eu
 
 repo_url=https://github.com/facebookresearch/faiss
-repo_rev=v1.8.0
+# repo_rev=v1.8.0
 rev_hash=4e6b6f8
 
-git clone "$repo_url" faiss --branch "$repo_rev" --depth 1
+git clone "$repo_url" faiss
 
 mkdir -p "$HOME/.faiss_c"
 
