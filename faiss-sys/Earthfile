@@ -1,0 +1,26 @@
+VERSION 0.8
+
+bindings:
+    FROM nvidia/cuda:12.3.2-devel-ubi8
+    RUN dnf update -y && \
+        dnf upgrade -y
+
+    RUN curl \
+        --proto '=https' \
+        --tlsv1.2 \
+        -sSf \
+        https://sh.rustup.rs \
+        | sh -s -- -y
+
+    ENV PATH=$HOME/.cargo/bin/:$PATH
+
+    RUN dnf install -y clang gcc cmake && \
+        dnf clean all
+
+    WORKDIR /faiss-sys
+    RUN cargo install bindgen-cli --version=^0.69
+    COPY . .
+    RUN ./gen_bindings.sh
+    SAVE ARTIFACT src/bindings.rs AS LOCAL src/bindings.rs
+
+    # RUN cargo build --release
