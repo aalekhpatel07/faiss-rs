@@ -5,6 +5,110 @@ use super::*;
 /// Alias for the native implementation of a flat index.
 pub type FlatIndex = FlatIndexImpl;
 
+mod binary {
+    use crate::index::CpuIndexBinary;
+    use super::*;
+    use faiss_sys::*;
+
+    pub type FlatIndexBinary = FlatIndexBinaryImpl;
+
+    #[derive(Debug)]
+    pub struct FlatIndexBinaryImpl {
+        inner: *mut FaissIndexBinaryFlat
+    }
+
+    unsafe impl Send for FlatIndexBinaryImpl {}
+    unsafe impl Sync for FlatIndexBinaryImpl {}
+
+    impl CpuIndexBinary for FlatIndexBinaryImpl {}
+
+
+    impl Drop for FlatIndexBinaryImpl {
+        fn drop(&mut self) {
+            unsafe {
+                faiss_IndexBinary_free(self.inner);
+            }
+        }
+    }
+
+    impl FlatIndexBinaryImpl {
+        /// Create a new flat index.
+        pub fn new(d: u32) -> Result<Self> {
+            unsafe {
+                let mut inner = ptr::null_mut();
+                faiss_try(faiss_IndexBinaryFlat_new_with(
+                    &mut inner,
+                    (d & 0x7FFF_FFFF) as idx_t,
+                ))?;
+                Ok(FlatIndexBinaryImpl { inner })
+            }
+        }
+    }
+
+
+    impl NativeIndexBinary for FlatIndexBinaryImpl {
+        fn inner_ptr(&self) -> *mut FaissIndexBinary {
+            self.inner
+        }
+    }
+
+    impl BinaryIndexImpl {
+        pub fn into_flat(self) -> Result<FlatIndexBinaryImpl> {
+            unsafe {
+                let new_inner = faiss_IndexBinaryFlat_cast(self.inner_ptr());
+                if new_inner.is_null() {
+                    Err(Error::BadCast)
+                } else {
+                    mem::forget(self);
+                    Ok(FlatIndexBinaryImpl { inner: new_inner })
+                }
+            }
+        }
+    }
+
+
+    impl FromInnerPtrBinary for FlatIndexBinaryImpl {
+        unsafe fn from_inner_ptr(inner_ptr: *mut FaissIndexBinary) -> Self {
+            FlatIndexBinaryImpl {
+                inner: inner_ptr as *mut FaissIndexBinaryFlat,
+            }
+        }
+    }
+
+    impl TryFromInnerPtrBinary for FlatIndexBinaryImpl {
+        unsafe fn try_from_inner_ptr(inner_ptr: *mut FaissIndexBinary) -> Result<Self>
+        where
+            Self: Sized,
+        {
+            // safety: `inner_ptr` is documented to be a valid pointer to an index,
+            // so the dynamic cast should be safe.
+            #[allow(unused_unsafe)]
+            unsafe {
+                let new_inner = faiss_IndexBinaryFlat_cast(inner_ptr);
+                if new_inner.is_null() {
+                    Err(Error::BadCast)
+                } else {
+                    Ok(FlatIndexBinaryImpl { inner: new_inner })
+                }
+            }
+        }
+    }
+
+    impl TryClone for FlatIndexBinaryImpl {
+        fn try_clone(&self) -> Result<Self>
+        where
+            Self: Sized,
+        {
+            try_clone_from_inner_ptr_binary(self)
+        }
+    }
+
+    impl_native_binary_index!(FlatIndexBinaryImpl);
+    // impl_concurrent_index_binary!(FlatIndexBinaryImpl);
+}
+
+pub use binary::*;
+
 /// Native implementation of a flat index.
 #[derive(Debug)]
 pub struct FlatIndexImpl {
@@ -155,14 +259,24 @@ impl_concurrent_index!(FlatIndexImpl);
 
 #[cfg(test)]
 mod tests {
-    use super::FlatIndexImpl;
+    use super::{FlatIndexImpl, FlatIndexBinaryImpl};
     use crate::index::{
         index_factory, ConcurrentIndex, FromInnerPtr, Idx, Index, NativeIndex, TryClone,
-        UpcastIndex,
+        UpcastIndex, index_binary_factory, ConcurrentIndexBinary, FromInnerPtrBinary, IndexBinary, NativeIndexBinary,
+        UpcastIndexBinary
     };
     use crate::metric::MetricType;
 
     const D: u32 = 8;
+
+    #[test]
+    fn flat_index_binary_from_upcast() {
+        let index = FlatIndexBinaryImpl::new(D).unwrap();
+
+        let index_impl = index.upcast();
+        assert_eq!(index_impl.d(), D);
+    }
+
 
     #[test]
     fn flat_index_from_upcast() {

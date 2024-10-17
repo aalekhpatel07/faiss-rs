@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -eu
 
-repo_url=https://github.com/facebookresearch/faiss
+repo_url=https://github.com/aalekhpatel07/faiss
 # repo_rev=v1.8.0
-rev_hash=4e6b6f8
+# rev_hash=4e6b6f8
+rev_hash=d6cf4777
 
 git clone "$repo_url" faiss
 

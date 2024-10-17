@@ -9,7 +9,7 @@ if ! which bindgen > /dev/null; then
 fi
 
 repo_url=https://github.com/facebookresearch/faiss
-repo_rev=v1.8.0
+repo_rev=v1.9.0
 cuda_root=/opt/cuda
 
 if [ ! -d faiss ]; then
@@ -24,18 +24,18 @@ for header in $headers; do
     echo "#include \""$header"\"" >> c_api.h;
 done
 
-cmd="bindgen --rust-target 1.59 $bindgen_opt c_api.h -o src/bindings.rs"
+cmd="bindgen --rust-target 1.59 $bindgen_opt c_api.h -o src/bindings.rs -- -Ifaiss/c_api"
 echo ${cmd}
 ${cmd}
 
-headers=faiss/c_api/gpu/*_c.h
-for header in $headers; do
-    echo "#include \""$header"\"" >> c_api.h;
-done
-
-cmd="bindgen --rust-target 1.59 $bindgen_opt c_api.h -o src/bindings_gpu.rs -- -Ifaiss/c_api -I$cuda_root/include"
-echo ${cmd}
-${cmd}
+#headers=faiss/c_api/gpu/*_c.h
+#for header in $headers; do
+#    echo "#include \""$header"\"" >> c_api.h;
+#done
+#
+#cmd="bindgen --rust-target 1.59 $bindgen_opt c_api.h -o src/bindings_gpu.rs -- -Ifaiss/c_api -I$cuda_root/include"
+#echo ${cmd}
+#${cmd}
 
 # clean up
 rm -f c_api.h
