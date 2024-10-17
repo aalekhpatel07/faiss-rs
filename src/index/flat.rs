@@ -272,9 +272,11 @@ mod tests {
     #[test]
     fn flat_index_binary_from_upcast() {
         let index = FlatIndexBinaryImpl::new(D).unwrap();
-
-        let index_impl = index.upcast();
+        let mut index_impl = index.upcast();
         assert_eq!(index_impl.d(), D);
+        assert_eq!(index_impl.ntotal(), 0);
+        index_impl.add(&[1; 4]).unwrap();
+        assert_eq!(index_impl.ntotal(), 4);
     }
 
 
