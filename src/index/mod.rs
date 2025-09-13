@@ -656,7 +656,10 @@ impl TryClone for BinaryIndexImpl {
     }
 }
 
+/// Extension trait providing parameterized search for native indexes
 pub trait SearchWithParamsMut<Data, Radius> {
+    /// Perform a search for the k closest vectors to the given query vectors,
+    /// with additional parameters.
     fn search_with_params(&mut self, query: &[Data], k: usize, params: &SearchParameters) -> Result<SearchResult<Radius>>;
 }
 
@@ -684,6 +687,8 @@ where
 }
 
 
+/// Extension trait providing parameterized search
+/// for thread-safe native indexes
 pub trait SearchWithParams<Data, Radius> {
     fn search_with_params(&self, query: &[Data], k: usize, params: &SearchParameters) -> Result<SearchResult<Radius>>;
 }

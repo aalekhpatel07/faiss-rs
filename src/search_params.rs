@@ -6,9 +6,13 @@ use crate::error::{Error, Result};
 use crate::faiss_try;
 use crate::selector::IdSelector;
 
+/// Additional search parameters,
+/// which can be used in method `search_with_params` of
+/// [`SearchWithParams`](crate::index::SearchWithParams)
+/// and [`SearchWithParamsMut`](crate::index::SearchWithParamsMut)
 pub type SearchParameters = SearchParametersImpl;
 
-
+/// Wrapper to a set of additional search parameters
 #[derive(Debug)]
 pub struct SearchParametersImpl {
     inner: *mut FaissSearchParameters
