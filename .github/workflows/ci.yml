@@ -44,7 +44,7 @@ jobs:
         run: cargo test --verbose
       # Run benchmarks
       - name: Run benchmarks
-        run: cargo bench
+        run: cargo bench --verbose
       # Collect criterion reports.
       - uses: actions/upload-artifact@v4
         with:
@@ -77,7 +77,7 @@ jobs:
         run: cargo test --verbose --features static
       # Run benchmarks
       - name: Run benchmarks
-        run: cargo bench
+        run: cargo bench --verbose --features static
       # Collect criterion reports.
       - uses: actions/upload-artifact@v4
         with:
