@@ -1,4 +1,3 @@
-use std::hint::black_box;
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 use faiss::{index::{flat::FlatIndexImpl, ivf_flat::IVFFlatIndexImpl}, Index, ConcurrentIndex};
 use rand::Rng;
