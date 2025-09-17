@@ -1,7 +1,9 @@
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
-use faiss::{index::{flat::FlatIndexImpl, ivf_flat::IVFFlatIndexImpl}, Index, ConcurrentIndex};
+use faiss::{
+    index::{flat::FlatIndexImpl, ivf_flat::IVFFlatIndexImpl},
+    ConcurrentIndex, Index,
+};
 use rand::Rng;
-
 
 pub fn generate_random_vectors(dimension: usize, size: usize) -> Vec<f32> {
     let mut rng = rand::rng();
@@ -12,12 +14,16 @@ pub fn generate_random_vectors(dimension: usize, size: usize) -> Vec<f32> {
     data
 }
 
-
-pub fn build_index(dimension: u32, nlist: u32, train_size: usize, dataset_size: usize) -> faiss::error::Result<IVFFlatIndexImpl> {
+pub fn build_index(
+    dimension: u32,
+    nlist: u32,
+    train_size: usize,
+    dataset_size: usize,
+) -> faiss::error::Result<IVFFlatIndexImpl> {
     let q = FlatIndexImpl::new_l2(dimension).unwrap();
     let mut index = IVFFlatIndexImpl::new_l2(q, dimension, nlist).unwrap();
 
-    let train_vectors= generate_random_vectors(dimension as usize, train_size);
+    let train_vectors = generate_random_vectors(dimension as usize, train_size);
     eprintln!("training index...");
     index.train(&train_vectors)?;
 
@@ -35,12 +41,7 @@ fn search_ivf_flat(c: &mut Criterion) {
     const DATASET_SIZE: usize = 1_000_000;
     const NEIGHBORS: usize = 25;
 
-    let index = build_index(
-        DIMENSION,
-        NLIST,
-        TRAIN_SIZE,
-        DATASET_SIZE
-    ).unwrap();
+    let index = build_index(DIMENSION, NLIST, TRAIN_SIZE, DATASET_SIZE).unwrap();
     eprintln!("finished building index");
 
     let total_steps = 11usize;
@@ -52,21 +53,14 @@ fn search_ivf_flat(c: &mut Criterion) {
 
     let mut group = c.benchmark_group("search_ivf_flat");
     for (idx, size) in sizes.iter().enumerate() {
-        group.bench_with_input(
-            BenchmarkId::from_parameter(size), 
-            size, 
-            |b, &_size| {
-                b.iter(|| {
-                    index.search(&queries[idx], NEIGHBORS).unwrap();
-                }
-            );
+        group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &_size| {
+            b.iter(|| {
+                index.search(&queries[idx], NEIGHBORS).unwrap();
+            });
         });
     }
     group.finish();
 }
 
-criterion_group!(
-    benches,
-    search_ivf_flat,
-);
+criterion_group!(benches, search_ivf_flat,);
 criterion_main!(benches);
