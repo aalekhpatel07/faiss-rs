@@ -16,6 +16,7 @@ fn dynamic_link_faiss() {
 fn get_faiss_simd_extension() -> String {
     #[cfg(all(feature = "avx512", feature = "avx2"))]
     eprintln!("Both avx512, and avx2 are specified. Using avx512 because it is at a higher optimization level than avx2.");
+    #[cfg(all(feature = "avx512", feature = "avx2"))]
     return String::from("_avx512");
     #[cfg(all(feature = "avx512", not(feature = "avx2")))]
     return String::from("_avx512");
