@@ -42,6 +42,14 @@ jobs:
       # Build and run tests
       - name: Run tests
         run: cargo test --verbose
+      # Run benchmarks
+      - name: Run benchmarks
+        run: cargo bench
+      # Collect criterion reports.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmarks-${{ matrix.rust }}
+          path: target/criterion
 
   # test `faiss` crates with static linking
   build-static:
@@ -67,6 +75,14 @@ jobs:
       # Build everything and run tests
       - name: Run tests
         run: cargo test --verbose --features static
+      # Run benchmarks
+      - name: Run benchmarks
+        run: cargo bench
+      # Collect criterion reports.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmarks-${{ matrix.rust }}
+          path: target/criterion
 
   clippy:
     name: Clippy
