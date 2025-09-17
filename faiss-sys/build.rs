@@ -2,11 +2,33 @@ fn main() {
     #[cfg(feature = "static")]
     static_link_faiss();
     #[cfg(not(feature = "static"))]
-    println!("cargo:rustc-link-lib=faiss_c");
+    dynamic_link_faiss();
 }
+
+#[cfg(not(feature = "static"))]
+fn dynamic_link_faiss() {
+    let ext = get_faiss_simd_extension();
+    println!("{}", format!("cargo:rustc-link-lib=faiss_c{ext}"));
+}
+
+// Get the SIMD extension set of preference
+// based on the feature flags.
+fn get_faiss_simd_extension() -> String {
+    #[cfg(all(feature = "avx512", feature = "avx2"))]
+    eprintln!("Both avx512, and avx2 are specified. Using avx512 because it is at a higher optimization level than avx2.")
+    return String::from("_avx512");
+    #[cfg(all(feature = "avx512", not(feature = "avx2")))]
+    return String::from("_avx512");
+    #[cfg(all(feature = "avx2", not(feature = "avx512")))]
+    return String::from("_avx2");
+    #[cfg(all(not(feature = "avx512"), not(feature = "avx2")))]
+    return String::from("")
+}
+
 
 #[cfg(feature = "static")]
 fn static_link_faiss() {
+    let ext = get_faiss_simd_extension();
     let mut cfg = cmake::Config::new("faiss");
     cfg.define("FAISS_ENABLE_C_API", "ON")
         .define("BUILD_SHARED_LIBS", "OFF")
@@ -30,8 +52,8 @@ fn static_link_faiss() {
         "cargo:rustc-link-search=native={}",
         faiss_c_location.display()
     );
-    println!("cargo:rustc-link-lib=static=faiss_c");
-    println!("cargo:rustc-link-lib=static=faiss");
+    println!("{}", format!("cargo:rustc-link-lib=static=faiss_c{ext}"));
+    println!("{}", format!("cargo:rustc-link-lib=static=faiss{ext}"));
     link_cxx();
     println!("cargo:rustc-link-lib=gomp");
     println!("cargo:rustc-link-lib=blas");
