@@ -10,12 +10,8 @@ categories = ["external-ffi-bindings", "algorithms"]
 keywords = ["cbir", "clustering", "index", "similarity", "bindings"]
 
 [features]
-default-features = []
 gpu = []
 static = ["cmake"]
-generic = []
-avx2 = []
-avx512 = []
 
 
 [build-dependencies]
