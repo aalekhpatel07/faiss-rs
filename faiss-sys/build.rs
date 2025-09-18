@@ -7,7 +7,6 @@ fn main() {
 
 #[cfg(feature = "static")]
 fn static_link_faiss() {
-    let ext = get_faiss_simd_extension();
     let mut cfg = cmake::Config::new("faiss");
     cfg.define("FAISS_ENABLE_C_API", "ON")
         .define("BUILD_SHARED_LIBS", "OFF")
