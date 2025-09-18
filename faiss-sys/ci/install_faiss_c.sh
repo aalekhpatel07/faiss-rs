@@ -28,16 +28,16 @@ mkdir -p "$HOME/.faiss_c"
 
 cd faiss
 
-git rev-parse HEAD > ../rev_hash
+#git rev-parse HEAD > ../rev_hash
 
-if [[ -s "$HOME/.faiss_c/rev_hash" && `diff -w -q ../rev_hash $HOME/.faiss_c/rev_hash` -eq "0" ]]; then
-    echo "libfaiss_c.so is already built for revision" `cat ../rev_hash`
-
-    # clean up
-    cd ..
-    rm -rf faiss rev_hash
-    exit 0
-fi
+#if [[ -s "$HOME/.faiss_c/rev_hash" && `diff -w -q ../rev_hash $HOME/.faiss_c/rev_hash` -eq "0" ]]; then
+#    echo "libfaiss_c.so is already built for revision" `cat ../rev_hash`
+#
+#    # clean up
+#    cd ..
+#    rm -rf faiss rev_hash
+#    exit 0
+#fi
 
 
 # Build
@@ -52,7 +52,7 @@ cmake . \
 
 make
 
-cp -f "../rev_hash" "$HOME/.faiss_c/"
+#cp -f "../rev_hash" "$HOME/.faiss_c/"
 cp -f "faiss/libfaiss${SIMD_SUFFIX}.so" "$HOME/.faiss_c/libfaiss.so"
 cp -f "c_api/libfaiss_c${SIMD_SUFFIX}.so" "$HOME/.faiss_c/libfaiss_c.so"
 
@@ -62,4 +62,5 @@ echo "libfaiss_c.so (" $(cat ../rev_hash) ") installed in $HOME/.faiss_c/"
 cd ..
 
 # clean up
-rm -rf faiss rev_hash
+#rm -rf faiss rev_hash
+rm -rf faiss
