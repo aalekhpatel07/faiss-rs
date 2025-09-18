@@ -31,7 +31,7 @@ cd faiss
 git rev-parse HEAD > ../rev_hash
 
 if [[ -s "$HOME/.faiss_c/rev_hash" && `diff -w -q ../rev_hash $HOME/.faiss_c/rev_hash` -eq "0" ]]; then
-    echo "libfaiss_c${SIMD_SUFFIX}.so is already built for revision" `cat ../rev_hash`
+    echo "libfaiss_c.so is already built for revision" `cat ../rev_hash`
 
     # clean up
     cd ..
@@ -51,9 +51,13 @@ cmake . \
     -DFAISS_OPT_LEVEL=${FAISS_OPT_LEVEL}
 
 make
-cp -f "../rev_hash" "faiss/libfaiss${SIMD_SUFFIX}.so" "c_api/libfaiss_c${SIMD_SUFFIX}.so" "$HOME/.faiss_c/"
 
-echo "libfaiss_c${SIMD_SUFFIX}.so (" `cat ../rev_hash` ") installed in $HOME/.faiss_c/"
+cp -f "../rev_hash" "$HOME/.faiss_c/"
+cp -f "faiss/libfaiss${SIMD_SUFFIX}.so" "$HOME/.faiss_c/libfaiss.so"
+cp -f "c_api/libfaiss_c${SIMD_SUFFIX}.so" "$HOME/.faiss_c/libfaiss_c.so"
+
+# shellcheck disable=SC2046
+echo "libfaiss_c.so (" $(cat ../rev_hash) ") installed in $HOME/.faiss_c/"
 
 cd ..
 

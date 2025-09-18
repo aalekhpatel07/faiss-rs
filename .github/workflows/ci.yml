@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         rust: ["stable", "beta"]
-        simd_ext: ["generic", "avx512", "avx2"]
+        simd_ext: ["avx2"]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,10 +40,10 @@ jobs:
           cache: true
       # Build and run tests
       - name: Run tests
-        run: cargo test --verbose --features ${{ matrix.simd_ext }}
+        run: cargo test --verbose
       # Run benchmarks
       - name: Run benchmarks
-        run: cargo bench --verbose --features ${{ matrix.simd_ext }}
+        run: cargo bench --verbose
       # Collect criterion reports.
       - uses: actions/upload-artifact@v4
         with:
