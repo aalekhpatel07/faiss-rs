@@ -212,7 +212,7 @@ where
         unsafe {
             let mut cpuindex_ptr = ptr::null_mut();
             faiss_try(faiss_index_gpu_to_cpu(self.inner, &mut cpuindex_ptr))?;
-            Ok(I::from_inner_ptr(cpuindex_ptr))
+            Ok(I::from_inner_ptr(cpuindex_ptr as *mut I::Inner))
         }
     }
 
