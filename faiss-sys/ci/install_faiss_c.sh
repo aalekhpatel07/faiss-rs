@@ -53,7 +53,8 @@ cmake . \
 make
 
 #cp -f "../rev_hash" "$HOME/.faiss_c/"
-cp -f "faiss/libfaiss${SIMD_SUFFIX}.so" "$HOME/.faiss_c/libfaiss.so"
+cp -f "faiss/libfaiss${SIMD_SUFFIX}.so" "$HOME/.faiss_c/"
+# renamed to libfaiss_c.so but it links against libfaiss${SIMD_SUFFIX}.so
 cp -f "c_api/libfaiss_c${SIMD_SUFFIX}.so" "$HOME/.faiss_c/libfaiss_c.so"
 
 # shellcheck disable=SC2046
