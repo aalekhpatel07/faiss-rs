@@ -50,7 +50,7 @@ jobs:
       # Collect criterion reports.
       - uses: actions/upload-artifact@v4
         with:
-          name: benchmarks-${{ matrix.rust }}
+          name: benchmarks-${{ runner.os }}-${{ matrix.rust }}-${{ matrix.simd_ext }}-${{ hashFiles('.git/modules/faiss-sys/faiss/HEAD') }}
           path: target/criterion
 
   # test `faiss` crates with static linking
