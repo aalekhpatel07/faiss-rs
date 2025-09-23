@@ -27,3 +27,7 @@ rand = "0.9.2"
 
 [package.metadata.docs.rs]
 features = ["gpu"]
+
+[[bench]]
+name = "search_index_ivf_flat"
+harness = false
