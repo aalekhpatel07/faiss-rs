@@ -18,7 +18,7 @@ static = ["faiss-sys/static"]
 status = "passively-maintained"
 
 [dependencies.faiss-sys]
-version = "0.6.3-alpha.0"
+version = "0.7.0"
 path = "faiss-sys"
 
 [package.metadata.docs.rs]
