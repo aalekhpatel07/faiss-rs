@@ -39,15 +39,16 @@ impl BinaryBloomIndexImpl {
     pub fn add(&mut self, x: &[u8]) -> Result<()> {
         unsafe {
             let n = x.len() / (self.d() / 8) as usize;
-            faiss_try(faiss_IndexBinaryBloom_add(self.inner as *mut FaissIndexBinaryBloom, n as i64, x.as_ptr()))?;
+            faiss_try(faiss_IndexBinaryBloom_add(
+                self.inner as *mut FaissIndexBinaryBloom,
+                n as i64,
+                x.as_ptr(),
+            ))?;
             Ok(())
         }
     }
 
-    pub fn reject(
-        &mut self,
-        query: &[u8],
-    ) -> Result<crate::index::RejectionResult> {
+    pub fn reject(&mut self, query: &[u8]) -> Result<crate::index::RejectionResult> {
         unsafe {
             let d = self.d() as usize;
             let nq = query.len() / (d / 8);
@@ -62,10 +63,7 @@ impl BinaryBloomIndexImpl {
             Ok(crate::index::RejectionResult { inner: p_rej })
         }
     }
-
-
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -76,7 +74,7 @@ mod tests {
     #[test]
     fn binary_bloom_index() {
         let mut index = BinaryBloomIndexImpl::new(D).unwrap();
-        let data = vec![0u8; {D as usize / 8} * 2];
+        let data = vec![0u8; { D as usize / 8 } * 2];
         index.add(&data).unwrap();
 
         let rejections = index.reject(&data).unwrap();
@@ -87,7 +85,5 @@ mod tests {
         let rejections = index.reject(&query).unwrap();
         assert_eq!(rejections.nq(), 1);
         assert_eq!(rejections.rejections(), [true]);
-
     }
-
 }
