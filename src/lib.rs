@@ -99,6 +99,7 @@ pub mod vector_transform;
 pub mod gpu;
 
 pub use index::flat::FlatIndex;
+pub use index::bloom::BinaryBloomIndex;
 pub use index::id_map::IdMap;
 pub use index::io::{read_index, write_index, read_index_binary, write_index_binary};
 pub use index::lsh::LshIndex;

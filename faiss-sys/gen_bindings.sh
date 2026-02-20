@@ -8,8 +8,10 @@ if ! which bindgen > /dev/null; then
     exit 1
 fi
 
-repo_url=https://github.com/facebookresearch/faiss
-repo_rev=v1.12.0
+# repo_url=https://github.com/facebookresearch/faiss
+repo_url=https://github.com/aalekhpatel07/faiss
+# repo_rev=v1.12.0
+repo_rev=binary-cache
 cuda_root=/usr/local/cuda
 
 if [ ! -d faiss ]; then

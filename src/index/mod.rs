@@ -22,6 +22,7 @@ use std::{mem, ptr};
 use faiss_sys::*;
 
 pub mod autotune;
+pub mod bloom;
 pub mod flat;
 pub mod id_map;
 pub mod io;
@@ -489,6 +490,36 @@ impl Drop for RangeSearchResult {
         }
     }
 }
+
+
+/// The outcome of a reject operation.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RejectionResult {
+    inner: *mut FaissRejectionResult,
+}
+
+impl RejectionResult {
+    pub fn nq(&self) -> usize {
+        unsafe { faiss_RejectionResult_nq(self.inner) }
+    }
+
+    pub fn set(&mut self, idx: usize, value: bool) {
+        unsafe { faiss_RejectionResult_set(
+            self.inner as *mut FaissRejectionResult,
+            idx,
+            value
+        );}
+    }
+
+    pub fn rejections(&self) -> &[bool] {
+        unsafe {
+            let mut rejections_ptr = ptr::null_mut() as *mut bool;
+            faiss_RejectionResult_rejections(self.inner, &mut rejections_ptr);
+            ::std::slice::from_raw_parts(rejections_ptr, self.nq())
+        }
+    }
+}
+
 
 /// Native implementation of a Faiss Index running on the CPU.
 #[derive(Debug)]
