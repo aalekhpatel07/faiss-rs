@@ -513,7 +513,7 @@ impl RejectionResult {
 
     pub fn rejections(&self) -> &[bool] {
         unsafe {
-            let mut rejections_ptr = ptr::null_mut() as *mut bool;
+            let mut rejections_ptr = ptr::null_mut();
             faiss_RejectionResult_rejections(self.inner, &mut rejections_ptr);
             ::std::slice::from_raw_parts(rejections_ptr, self.nq())
         }
