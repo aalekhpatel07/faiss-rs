@@ -22,6 +22,7 @@ use std::{mem, ptr};
 use faiss_sys::*;
 
 pub mod autotune;
+pub mod bloom;
 pub mod flat;
 pub mod id_map;
 pub mod io;

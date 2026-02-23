@@ -154,12 +154,85 @@ impl TryClone for FlatIndexImpl {
 
 impl_concurrent_index!(FlatIndexImpl);
 
+mod binary {
+    use super::*;
+
+    /// Alias for the native implementation of a binary IVF index.
+    pub type BinaryFlatIndex = BinaryFlatIndexImpl;
+
+    /// Native implementation of a binary IVF index.
+    #[derive(Debug)]
+    pub struct BinaryFlatIndexImpl {
+        inner: *mut FaissIndexBinaryFlat,
+    }
+
+    unsafe impl Send for BinaryFlatIndexImpl {}
+    unsafe impl Sync for BinaryFlatIndexImpl {}
+
+    impl CpuIndex<u8, i32> for BinaryFlatIndexImpl {}
+
+    impl Drop for BinaryFlatIndexImpl {
+        fn drop(&mut self) {
+            unsafe {
+                faiss_IndexBinaryFlat_free(self.inner);
+            }
+        }
+    }
+
+    impl NativeIndex<u8, i32> for BinaryFlatIndexImpl {
+        type Inner = FaissIndexBinary;
+        fn inner_ptr(&self) -> *mut FaissIndexBinary {
+            self.inner
+        }
+    }
+
+    impl FromInnerPtr<u8, i32> for BinaryFlatIndexImpl {
+        unsafe fn from_inner_ptr(inner_ptr: *mut FaissIndexBinary) -> Self {
+            BinaryFlatIndexImpl {
+                inner: inner_ptr as *mut FaissIndexBinaryFlat,
+            }
+        }
+    }
+
+    impl_native_index_binary!(BinaryFlatIndexImpl);
+
+    impl TryClone for BinaryFlatIndexImpl {
+        fn try_clone(&self) -> Result<Self>
+        where
+            Self: Sized,
+        {
+            try_clone_binary_from_inner_ptr(self)
+        }
+    }
+
+    impl_concurrent_index_binary!(BinaryFlatIndexImpl);
+
+    impl BinaryIndexImpl {
+        /// 
+        /// Attempt a dynamic cast of a binary index to the Binary IVF index type.
+        pub fn into_flat(self) -> Result<BinaryFlatIndexImpl> {
+            unsafe {
+                let new_inner = faiss_IndexBinaryFlat_cast(self.inner_ptr());
+                if new_inner.is_null() {
+                    Err(Error::BadCast)
+                } else {
+                    mem::forget(self);
+                    Ok(BinaryFlatIndexImpl { inner: new_inner })
+                }
+            }
+        }
+    }
+
+}
+pub use binary::*;
+
 #[cfg(test)]
 mod tests {
     use super::FlatIndexImpl;
     use crate::index::{
         index_factory, ConcurrentIndex, FromInnerPtr, Idx, Index, NativeIndex, TryClone,
         UpcastIndex,
+        index_binary_factory,
     };
     use crate::metric::MetricType;
 
@@ -367,5 +440,21 @@ mod tests {
             }
         };
         assert_eq!(index.ntotal(), 5);
+    }
+
+    #[test]
+    fn flat_index_binary_from_cast() {
+
+        let mut index = index_binary_factory(256, "BFlat").unwrap();
+        assert_eq!(index.is_trained(), true); // Binary Flat index does not need training
+
+        let data = vec![0u8; 64];
+        index.add(&data).unwrap();
+        assert_eq!(index.ntotal(), 2);
+
+        let index = index.into_flat().unwrap();
+
+        assert_eq!(index.is_trained(), true);
+        assert_eq!(index.ntotal(), 2);
     }
 }
