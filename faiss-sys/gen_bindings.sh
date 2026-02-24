@@ -8,8 +8,10 @@ if ! which bindgen > /dev/null; then
     exit 1
 fi
 
-repo_url=https://github.com/facebookresearch/faiss
-repo_rev=v1.12.0
+# repo_url=https://github.com/facebookresearch/faiss
+repo_url=https://github.com/aalekhpatel07/faiss
+# repo_rev=v1.12.0
+repo_rev=index-binary-flat
 cuda_root=/usr/local/cuda
 
 if [ ! -d faiss ]; then
@@ -27,6 +29,8 @@ done
 cmd="bindgen --rust-target 1.84 $bindgen_opt c_api.h -o src/bindings.rs"
 echo ${cmd}
 ${cmd}
+
+exit 0;
 
 headers=faiss/c_api/gpu/*_c.h
 for header in $headers; do

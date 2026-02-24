@@ -21,5 +21,8 @@ status = "passively-maintained"
 version = "0.6.3-alpha.0"
 path = "faiss-sys"
 
+[dev-dependencies]
+rand = "0.10.0"
+
 [package.metadata.docs.rs]
 features = ["gpu"]
