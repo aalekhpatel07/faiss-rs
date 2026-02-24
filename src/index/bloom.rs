@@ -1,6 +1,5 @@
-use std::{convert::TryInto, iter::FromIterator};
+use std::convert::TryInto;
 
-use super::*;
 
 /// A segment is essentially a bitmap of
 /// representing values in [0, 65536).
@@ -106,7 +105,7 @@ impl BloomCache {
     /// Create a new Cache with the given number of 16-bits wide segments.
     pub fn new(num_segments: usize) -> Self {
         Self { 
-            segments: (0..num_segments).into_iter().map(|_| Segment::default()).collect(),
+            segments: (0..num_segments).map(|_| Segment::default()).collect(),
             size: 0
         }
     }
